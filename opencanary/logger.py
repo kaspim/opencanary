@@ -227,20 +227,32 @@ class SlackHandler(logging.Handler):
         logging.Handler.__init__(self)
         self.webhook_url=webhook_url
 
-    def generate_msg(self, alert):
-        msg = {}
-        msg['pretext'] = "OpenCanary Alert"
-        data=json.loads(alert.msg)
-        msg['fields']=[]
-        for k,v in data.items():
-            msg['fields'].append({'title':k, 'value':json.dumps(v) if type(v) is dict else v})
-        return {'attachments':[msg]}
+    def message(self, data):
+        message = {
+            "attachments": [{
+                "color": "#49c176",
+                "pretext": "OpenCanary Alert",
+                "fields": self.fields(data)
+            }]
+        }
+        return message
+
+    def fields(self, data, prefix=None):
+        fields = []
+        for k, v in data.items():
+            key = str(k).lower() if prefix is None else prefix + '__' + str(k).lower()
+            if type(v) is not dict:
+                fields.append({"title": key, "value": str(v)})
+            else:
+                nested = self.fields(v, key)
+                fields.extend(nested)
+        return fields
 
     def emit(self, record):
-        data = self.generate_msg(record)
-        response = requests.post(
-            self.webhook_url, json=data
-            )
+        data = json.loads(record.msg)
+        payload = self.message(data)
+        headers = {'Content-Type': 'application/json'}
+        response = requests.post(self.webhook_url, headers=headers, json=payload)
         if response.status_code != 200:
             print("Error %s sending Slack message, the response was:\n%s" % (response.status_code, response.text))
 

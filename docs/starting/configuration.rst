@@ -150,6 +150,10 @@ you will receive a json formatted config file at `/etc/opencanary/opencanary.con
             {
                 "desc": "Synology NAS Login",
                 "name": "nasLogin"
+            },
+            {
+                "desc": "phpMyAdmin Login",
+                "name": "phpMyAdmin"
             }
         ],
         "httpproxy.enabled" : false,

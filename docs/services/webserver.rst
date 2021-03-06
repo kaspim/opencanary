@@ -21,6 +21,10 @@ Inside ~/.opencanary.conf:
         {
             "desc": "Synology NAS Login",
             "name": "nasLogin"
+        },
+        {
+            "desc": "phpMyAdmin Login",
+            "name": "phpMyAdmin"
         }
     ],
     "ssh.enabled": true,
